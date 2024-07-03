@@ -36,7 +36,6 @@ export const scheduleCronJobs = () => {
               scannedAt: new Date()
             });
             await whoisResult.save();
-            domain.status = 'completed';
             domain.lastScanned = new Date()
             await domain.save();
           }
