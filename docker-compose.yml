@@ -1,0 +1,40 @@
+version: "3"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - VIRUS_TOTAL_API_KEY=${VIRUS_TOTAL_API_KEY}
+      - VIRUSTOTAL_API_URL=${VIRUSTOTAL_API_URL}
+      - WHOISXML_API_KEY=${WHOISXML_API_KEY}
+      - WHOIS_API_URL=${WHOIS_API_URL}
+      - MONGO_USER_NAME=${MONGO_USER_NAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - MONGO_URI=${MONGO_URI}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+    depends_on:
+      - mongodb
+    networks:
+      - reflectiz-network # Assigning the custom network
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - reflectiz-network # Assigning the custom network
+
+networks:
+  reflectiz-network: # Defining the custom network
+    driver: bridge # You can use other drivers based on your needs
+
+volumes:
+  mongodb_data:
+    driver: local
