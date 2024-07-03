@@ -1,71 +1,36 @@
-// import mongoose, { Document } from 'mongoose';
-
-// export interface DomainInfo {
-//   name: string;
-//   virustotalInfo?: VirusTotalInfo;
-//   whoisInfo?: WhoisInfo;
-//   status:  'pending' | 'completed' | 'failed';
-//   lastScanned?: Date
-// }
-
-// export interface VirusTotalInfo {
-//   [key: string]: any; 
-// }
-
-// export interface WhoisInfo {
-//   [key: string]: any; 
-// }
-
-
-// interface DomainDocument extends DomainInfo, Document {}
-
-// const domainSchema = new mongoose.Schema({
-//   name: { type: String, required: true, unique: true },
-//   status: { type: String, enum: ['pending', 'completed', 'failed'], default: 'pending' },
-//   virustotalInfo: Object,
-//   whoisInfo: Object,
-//   lastScanned: Date
-// });
-
-// const Domain = mongoose.model<DomainDocument>('domains', domainSchema);
-// export default Domain;
-
 import mongoose, { Document } from 'mongoose';
 
 export interface DomainInfo {
   name: string;
-  virustotalInfo?: VirusTotalInfo;
-  whoisInfo?: WhoisInfo;
-  status:  'pending' | 'completed' | 'failed';
-  lastScanned?: Date
+  status: 'pending' | 'completed' | 'failed';
+  lastScanned?: Date;
 }
 
-export interface VirusTotalInfo {
-  [key: string]: any; 
+export interface DomainDoc extends Document, DomainInfo {
 }
 
-export interface WhoisInfo {
-  [key: string]: any; 
-}
-
-export interface DomainDoc extends Document{
-  name: string;
-  virustotalInfo?: VirusTotalInfo;
-  whoisInfo?: WhoisInfo;
-  status:  'pending' | 'completed' | 'failed';
-  lastScanned?: Date
-}
-
-interface DomainModel extends mongoose.Model<DomainDoc>{}
+interface DomainModel extends mongoose.Model<DomainDoc> {}
 
 const domainSchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
+  name: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    validate: {
+      validator: function(v: string) {
+        return /^[a-zA-Z0-9\-\.]+$/.test(v);
+      },
+      message: (props: any) => `${props.value} is not a valid domain name!`
+    }
+  },
   status: { type: String, enum: ['pending', 'completed', 'failed'], default: 'pending' },
-  virustotalInfo: Object,
-  whoisInfo: Object,
   lastScanned: Date
 });
 
-const Domain = mongoose.model<DomainDoc, DomainModel>('domains', domainSchema);
+domainSchema.index({ name: 1 }); 
+domainSchema.index({ status: 1 }); 
+
+const Domain = mongoose.model<DomainDoc, DomainModel>('Domains', domainSchema);
 
 export default Domain;

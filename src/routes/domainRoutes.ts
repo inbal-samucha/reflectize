@@ -1,6 +1,7 @@
 import ServerError from '../errors/ServerError';
 import express, { Request, Response } from 'express';
 import Domain, { DomainDoc } from '../models/Domain';
+import ScanResult from '../models/scanResult';
 
 const domainRoutes = express.Router();
 
@@ -9,14 +10,26 @@ domainRoutes.get('/domain/:domain', async (req: Request, res: Response) => {
   try {
     const domainInfo: DomainDoc | null = await Domain.findOne( { name: domain });
 
-    if(!domainInfo || domainInfo.status === 'pending'){
-      await Domain.updateOne({ name: domain }, { $set: { name: domain, status: 'pending' } }, { upsert: true });
+    if(!domainInfo){
 
+      const newDomain: DomainDoc = new Domain({ name: domain });
+      await newDomain.save();
       return res.status(202).send({ message: 'Domain added for analysis, check back later.' });
     }
 
+    const recentScan = await ScanResult.find({
+      domain: domain,
+      scannedAt: { $gte: new Date(new Date().setDate(new Date().getDate() - 30)) }
+    });
 
-    res.send(domainInfo);
+    console.log(recentScan);
+    
+    if (recentScan.length === 0) {
+      return res.status(202).send({ message: 'Domain is being analyzed, check back later.' });
+    }
+
+
+    res.send(recentScan);
 
   } catch (err){
     throw new ServerError({code: 500, message: 'Internal Server Error', logging: true});

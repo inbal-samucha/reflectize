@@ -1,27 +1,46 @@
 import cron from 'node-cron';
 import { getWhoisInfo } from './whoisService';
 import { getVirusTotalInfo } from './virusTotslService';
-import Domain, { VirusTotalInfo, WhoisInfo } from '../models/Domain';
+import Domain, { DomainDoc } from '../models/Domain';
 import BadRequestError from '../errors/BadRequestError';
+import ScanResult from '../models/scanResult';
 
 export const scheduleCronJobs = () => { 
   cron.schedule('0 0 1 * *', async () => {
     try{
 
-      const domainsToAnalyze = await Domain.find({ status : 'pending'});
-      if(domainsToAnalyze){
-
+      const domainsToAnalyze: DomainDoc[] = await Domain.find({});
+    
         for(const domain of domainsToAnalyze){
-          const virustotalInfo: VirusTotalInfo = await getVirusTotalInfo(domain.name); 
-          const whoisData: WhoisInfo = await getWhoisInfo(domain.name);
+          const recentScan = await ScanResult.findOne({
+            domain: domain.name,
+            scannedAt: { $gte: new Date(new Date().setDate(new Date().getDate() - 30)) }
+          });
 
-          domain.virustotalInfo = virustotalInfo;
-          domain.whoisInfo = whoisData;
-          domain.status = 'completed';
-          domain.lastScanned = new Date()
-          await domain.save();
+          if (!recentScan) {
+            const virusTotalInfo = await getVirusTotalInfo(domain.name); 
+            const whoisInfo = await getWhoisInfo(domain.name);
+  
+            const virusTotalResult = new ScanResult({
+              domain: domain.name,
+              provider: 'VirusTotal',
+              result: virusTotalInfo,
+              scannedAt: new Date()
+            });
+            await virusTotalResult.save();
+
+            const whoisResult = new ScanResult({
+              domain: domain.name,
+              provider: 'WHOIS',
+              result: whoisInfo,
+              scannedAt: new Date()
+            });
+            await whoisResult.save();
+            domain.status = 'completed';
+            domain.lastScanned = new Date()
+            await domain.save();
+          }
         }
-      }
 
     } catch (err) {
       console.log(err);
@@ -29,3 +48,4 @@ export const scheduleCronJobs = () => {
     }
   })
 }
+

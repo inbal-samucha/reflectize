@@ -1,10 +1,10 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import axios from "axios";
-import { WhoisInfo } from "../models/Domain";
+
 import BadRequestError from '../errors/BadRequestError';
 
-async function getWhoisInfo(domain: string): Promise<WhoisInfo> {
+async function getWhoisInfo(domain: string) {
     try {
         const response = await axios.get(`${process.env.WHOIS_API_URL}`, {
             params: {
