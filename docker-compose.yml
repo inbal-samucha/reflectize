@@ -15,12 +15,10 @@ services:
       - MONGO_PASSWORD=${MONGO_PASSWORD}
       - MONGO_DB_NAME=${MONGO_DB_NAME}
       - MONGO_URI=${MONGO_URI}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
     depends_on:
       - mongodb
     networks:
-      - reflectiz-network # Assigning the custom network
+      - reflectiz-network
 
   mongodb:
     image: mongo:latest
@@ -29,11 +27,11 @@ services:
     volumes:
       - mongodb_data:/data/db
     networks:
-      - reflectiz-network # Assigning the custom network
+      - reflectiz-network
 
 networks:
-  reflectiz-network: # Defining the custom network
-    driver: bridge # You can use other drivers based on your needs
+  reflectiz-network:
+    driver: bridge
 
 volumes:
   mongodb_data:
