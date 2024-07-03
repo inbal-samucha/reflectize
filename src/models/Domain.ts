@@ -2,7 +2,6 @@ import mongoose, { Document } from 'mongoose';
 
 export interface DomainInfo {
   name: string;
-  status: 'pending' | 'completed' | 'failed';
   lastScanned?: Date;
 }
 
@@ -24,12 +23,10 @@ const domainSchema = new mongoose.Schema({
       message: (props: any) => `${props.value} is not a valid domain name!`
     }
   },
-  status: { type: String, enum: ['pending', 'completed', 'failed'], default: 'pending' },
   lastScanned: Date
 });
 
 domainSchema.index({ name: 1 }); 
-domainSchema.index({ status: 1 }); 
 
 const Domain = mongoose.model<DomainDoc, DomainModel>('Domains', domainSchema);
 
