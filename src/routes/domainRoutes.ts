@@ -9,12 +9,12 @@ domainRoutes.get('/domain/:domain', async (req: Request, res: Response) => {
   try {
     const domainInfo: DomainDoc | null = await Domain.findOne( { name: domain });
 
-    if(!domainInfo){
-      const newDomain: DomainDoc = await new Domain({ name: domain });
-      await newDomain.save()
-  
+    if(!domainInfo || domainInfo.status === 'pending'){
+      await Domain.updateOne({ name: domain }, { $set: { name: domain, status: 'pending' } }, { upsert: true });
+
       return res.status(202).send({ message: 'Domain added for analysis, check back later.' });
     }
+
 
     res.send(domainInfo);
 
