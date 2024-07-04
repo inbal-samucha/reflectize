@@ -42,7 +42,6 @@ export const scheduleCronJobs = () => {
         }
 
     } catch (err) {
-      console.log(err);
       throw new BadRequestError({code: 400, message: 'Something went worng with cron job', logging: true});
     }
   })

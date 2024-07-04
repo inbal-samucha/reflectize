@@ -9,7 +9,6 @@ export interface DomainDoc extends Document, DomainInfo {}
 
 interface DomainModel extends mongoose.Model<DomainDoc> {}
 
-// Common regex pattern for domain name validation
 const domainPattern = /^(?!:\/\/)([a-zA-Z0-9-]{1,63}\.)+[a-zA-Z]{2,6}$/;
 
 const domainSchema = new mongoose.Schema({

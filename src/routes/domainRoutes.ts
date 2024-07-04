@@ -22,7 +22,6 @@ domainRoutes.get('/domain/:domain', async (req: Request, res: Response) => {
       scannedAt: { $gte: new Date(new Date().setDate(new Date().getDate() - 30)) }
     });
 
-    console.log(recentScan);
     
     if (recentScan.length === 0) {
       return res.status(202).send({ message: 'Domain is being analyzed, check back later.' });
