@@ -1,7 +1,7 @@
 import ServerError from '../errors/ServerError';
 import express, { Request, Response } from 'express';
 import Domain, { DomainDoc } from '../models/Domain';
-import ScanResult from '../models/scanResult';
+import ScanResult from '../models/ScanResult';
 
 const domainRoutes = express.Router();
 
@@ -53,5 +53,7 @@ domainRoutes.post('/domain', async (req: Request, res: Response) => {
     throw new ServerError({code: 500, message: 'Internal Server Error', logging: true});
   }
 });
+
+
 
 export { domainRoutes }

@@ -3,7 +3,7 @@ import { getWhoisInfo } from './whoisService';
 import { getVirusTotalInfo } from './virusTotslService';
 import Domain, { DomainDoc } from '../models/Domain';
 import BadRequestError from '../errors/BadRequestError';
-import ScanResult from '../models/scanResult';
+import ScanResult from '../models/ScanResult';
 
 export const scheduleCronJobs = () => { 
   cron.schedule('0 0 1 * *', async () => {
